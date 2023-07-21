@@ -31,7 +31,7 @@
 ✅ Support **Samsung SmartTV** from `2016+`<br/>
 ✅ Wake TV from sleep mode thanks to `Wake-on-LAN (WoL)`<br/>
 ✅ Send `one` or `multiple` keys at once to the TV<br/>
-✅ `241` known keys already predefined<br/>
+✅ `241` known [keys](https://github.com/badisi/samsung-tv-remote/blob/main/src/keys.ts) already predefined<br/>
 
 
 ## Installation
