@@ -1,0 +1,26 @@
+name: 📚 Docs enhancement
+description: File an enhancement or report an issue in the library's documentation
+title: "[DOCS] <title>"
+labels: [documentation, needs triage]
+
+body:
+- type: checkboxes
+  attributes:
+    label: Documentation can be submitted with pull requests
+    options:
+    - label: I know that I can edit the docs myself but prefer to file this issue instead
+      required: true
+
+- type: input
+  attributes:
+    label: Docs URL
+    description: The URL of the page you'd like to see an enhancement to or report a problem from.
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Description
+    description: A clear and concise description of the enhancement or problem.
+  validations:
+    required: true

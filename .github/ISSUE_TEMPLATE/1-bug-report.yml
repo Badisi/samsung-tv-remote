@@ -1,0 +1,57 @@
+name: 🐞 Bug report
+description: Report a bug in the library
+title: "[BUG] <title>"
+labels: [bug, needs triage]
+
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: |
+      Please search open and closed issues before submitting a new one.
+      Existing issues often contain information about workarounds, resolution or progress updates.
+    options:
+    - label: I have searched the existing issues
+      required: true
+
+- type: input
+  attributes:
+    label: Library version
+    description: Please make sure you have installed the latest version and verified it is still an issue.
+    placeholder: latest
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Description
+    description: A clear & concise description of what you're experiencing.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Steps to reproduce
+    description: |
+      Issues that don't have enough info and can't be reproduced will be closed.
+      Please provide the steps to reproduce the behavior and if applicable create a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
+      in a [new repository](https://github.com/new), a [gist](https://gist.github.com) or a [live demo](https://stackblitz.com).
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Environment
+    description: |
+      examples:
+        - **OS Name**: macOS Monterey (version 12.6.1)
+        - **System Model Name**: MacBook Pro (16-inch, 2019)
+        - **npm**: **`npm -v`**: 7.6.3
+        - **Node.js**: **`node -v`**: 13.14.0
+    value: |
+        - **OS Name**:
+        - **System Model Name**:
+        - **npm**:
+        - **Node.js**:
+  validations:
+    required: false

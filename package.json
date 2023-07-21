@@ -1,24 +1,48 @@
 {
-	"name": "samsung-tv-remote",
-	"version": "1.0.0",
-	"private": true,
-	"description": "Remote client for Samsung SmartTV starting from 2016",
-	"homepage": "https://github.com/Badisi/samsung-tv-remote",
-	"license": "MIT",
-	"author": {
-		"name": "Badisi"
-	},
-	"main": "index.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Badisi/samsung-tv-remote.git"
-	},
-	"keywords": [
-		"samsung",
-		"smarttv",
-		"remote"
-	],
-	"dependencies": {
-		"ws": "^2.3.1"
-	}
+    "name": "samsung-tv-remote",
+    "version": "1.0.0",
+    "description": "Remote client for Samsung SmartTV starting from 2016",
+    "homepage": "https://github.com/badisi/samsung-tv-remote",
+    "license": "MIT",
+    "author": {
+        "name": "Badisi"
+    },
+    "type": "commonjs",
+    "main": "src/index.js",
+    "typings": "src/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.d.ts",
+            "default": "./src/index.js",
+            "require": "./src/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/badisi/samsung-tv-remote.git"
+    },
+    "keywords": [
+        "samsung",
+        "smarttv",
+        "remote"
+    ],
+    "scripts": {
+        "ncu": "npx npm-check-updates -i --format=group --packageFile '{,projects/**/}package.json'",
+        "build": "node ./build.mjs",
+        "test:cjs": "node ./tests/test.cjs",
+        "test:mjs": "node ./tests/test.mjs"
+    },
+    "dependencies": {
+        "wake_on_lan": "^1.0.0",
+        "ws": "^8.13.0"
+    },
+    "devDependencies": {
+        "@colors/colors": "^1.6.0",
+        "@types/node": "^20.4.2",
+        "@types/wake_on_lan": "^0.0.30",
+        "@types/ws": "^8.5.5",
+        "cpy": "^10.1.0",
+        "typescript": "^5.1.6"
+    }
 }
