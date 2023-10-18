@@ -35,14 +35,14 @@
     },
     "dependencies": {
         "wake_on_lan": "^1.0.0",
-        "ws": "^8.13.0"
+        "ws": "^8.14.2"
     },
     "devDependencies": {
         "@colors/colors": "^1.6.0",
-        "@types/node": "^20.4.9",
-        "@types/wake_on_lan": "^0.0.30",
-        "@types/ws": "^8.5.5",
+        "@types/node": "^20.8.7",
+        "@types/wake_on_lan": "^0.0.32",
+        "@types/ws": "^8.5.7",
         "cpy": "^10.1.0",
-        "typescript": "^5.1.6"
+        "typescript": "^5.2.2"
     }
 }
