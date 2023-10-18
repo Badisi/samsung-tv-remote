@@ -8,20 +8,16 @@
 
 <p align="center">
     <a href="https://www.npmjs.com/package/samsung-tv-remote">
-        <img src="https://img.shields.io/npm/v/samsung-tv-remote.svg?color=blue&logo=npm" alt="npm version" />
-    </a>
+        <img src="https://img.shields.io/npm/v/samsung-tv-remote.svg?color=blue&logo=npm" alt="npm version" /></a>
     <a href="https://npmcharts.com/compare/samsung-tv-remote?minimal=true">
-        <img src="https://img.shields.io/npm/dw/samsung-tv-remote.svg?color=7986CB&logo=npm" alt="npm donwloads" />
-    </a>
+        <img src="https://img.shields.io/npm/dw/samsung-tv-remote.svg?color=7986CB&logo=npm" alt="npm donwloads" /></a>
     <a href="https://github.com/badisi/samsung-tv-remote/blob/main/LICENSE">
-        <img src="https://img.shields.io/npm/l/samsung-tv-remote.svg?color=ff69b4" alt="license" />
-    </a>
+        <img src="https://img.shields.io/npm/l/samsung-tv-remote.svg?color=ff69b4" alt="license" /></a>
 </p>
 
 <p align="center">
     <a href="https://github.com/badisi/samsung-tv-remote/blob/main/CONTRIBUTING.md#-submitting-a-pull-request-pr">
-        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" />
-    </a>
+        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" /></a>
 </p>
 
 <hr/>
