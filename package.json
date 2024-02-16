@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "@colors/colors": "^1.6.0",
-        "@types/node": "^20.11.0",
+        "@types/node": "^20.11.19",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.5.10",
         "cpy": "^11.0.0",
