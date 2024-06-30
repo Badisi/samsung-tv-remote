@@ -1,0 +1,15 @@
+name: Release library
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  ci_release:
+    uses: dsi-hug/action/.github/workflows/action.yml@v1
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    with:
+      lint: false
+      test: false
+      release: true
