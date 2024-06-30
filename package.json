@@ -31,7 +31,8 @@
         "ncu": "npx npm-check-updates -i --format=group --packageFile '{,projects/**/}package.json'",
         "build": "node ./build.mjs",
         "test:cjs": "node ./tests/test.cjs",
-        "test:mjs": "node ./tests/test.mjs"
+        "test:mjs": "node ./tests/test.mjs",
+        "release": "npm publish ./dist --access public"
     },
     "dependencies": {
         "wake_on_lan": "^1.0.0",
