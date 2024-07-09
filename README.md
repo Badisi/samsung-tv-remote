@@ -138,6 +138,19 @@ class SamsungTvRemote {
 ```
 
 
+## FAQ
+
+### I'm getting a `TypeError: bufferUtil.mask is not a function`
+
+Under the hood, this library is using [ws](https://github.com/websockets/ws) package and also [bufferutil](https://github.com/websockets/bufferutil) to enhance ws' performances.
+
+Since `bufferutil` is a binary addon, it may or may not be installed correctly on your current platform due to potential incompatibilities.
+
+In such cases, using the environment variable `WS_NO_BUFFER_UTIL=1` will be necessary to resolve the issue.
+
+You can read more [here](https://github.com/websockets/ws/blob/master/doc/ws.md#ws_no_buffer_util).
+
+
 ## Development
 
 See the [developer docs][developer].
