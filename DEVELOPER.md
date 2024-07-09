@@ -46,7 +46,7 @@ This project comes with automatic continuous delivery (CD) using *GitHub Actions
 
 1. Bump the library version in `./package.json`
 2. Push the changes
-3. Create a new: [GitHub release](https://github.com/badisi/samsung-tv-remote/releases/new)
+3. Create a new [GitHub release](https://github.com/badisi/samsung-tv-remote/releases/new)
 4. Watch the results in: [Actions](https://github.com/badisi/samsung-tv-remote/actions)
 
 
