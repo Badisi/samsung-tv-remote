@@ -12,9 +12,9 @@
     "typings": "src/index.d.ts",
     "exports": {
         ".": {
+            "require": "./src/index.js",
             "types": "./src/index.d.ts",
-            "default": "./src/index.js",
-            "require": "./src/index.js"
+            "default": "./src/index.js"
         },
         "./package.json": "./package.json"
     },
