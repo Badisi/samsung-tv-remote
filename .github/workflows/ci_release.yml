@@ -6,7 +6,7 @@ on:
 
 jobs:
   ci_release:
-    uses: dsi-hug/action/.github/workflows/action.yml@v1
+    uses: dsi-hug/actions/.github/workflows/action.yml@v2
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     with:
