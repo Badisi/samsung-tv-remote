@@ -29,7 +29,7 @@ export class SamsungTvRemote {
             mac: options.mac ?? '00:00:00:00:00:00',
             port: options.port ?? 8002,
             timeout: options.timeout ?? 1000,
-            debug: (options.debug !== undefined) ? options.debug : false
+            debug: options.debug ?? false
         };
         this.logger.enabled(this.options.debug);
         this.logger.log('Options:', this.options);
