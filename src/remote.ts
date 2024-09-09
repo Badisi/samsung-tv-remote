@@ -115,7 +115,7 @@ export class SamsungTvRemote {
                             if (!(await this.isTvAlive())) {
                                 const msg = 'TV won\'t wake up';
                                 this.logger.error(msg);
-                                return reject(`[SamsungTvRemote]: Error: ${msg}`);
+                                return reject(new Error(`[SamsungTvRemote]: Error: ${msg}`));
                             }
                             return resolve();
                         }, 5000);
