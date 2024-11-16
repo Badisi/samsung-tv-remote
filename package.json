@@ -40,9 +40,9 @@
     },
     "devDependencies": {
         "@colors/colors": "^1.6.0",
-        "@types/node": "^22.7.9",
+        "@types/node": "^22.9.0",
         "@types/wake_on_lan": "^0.0.33",
-        "@types/ws": "^8.5.12",
+        "@types/ws": "^8.5.13",
         "cpy": "^11.1.0",
         "typescript": "^5.6.3"
     },
