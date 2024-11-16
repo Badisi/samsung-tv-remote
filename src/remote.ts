@@ -107,7 +107,7 @@ export class SamsungTvRemote {
                         // Gives a little time for the TV to start
                         setTimeout(async () => {
                             if (!(await this.isTvAlive())) {
-                                const msg = 'TV won\'t wake up';
+                                const msg = "TV won't wake up";
                                 this.logger.error(msg);
                                 return reject(new Error(`[SamsungTvRemote]: Error: ${msg}`));
                             }
@@ -127,9 +127,12 @@ export class SamsungTvRemote {
     private getCachePath(name = 'badisi-samsung-tv-remote.json'): string {
         const homeDir = homedir();
         switch (process.platform) {
-            case 'darwin': return join(homeDir, 'Library', 'Caches', name);
-            case 'win32': return join(process.env.LOCALAPPDATA ?? join(homeDir, 'AppData', 'Local'), name);
-            default: return join(process.env.XDG_CACHE_HOME ?? join(homeDir, '.cache'), name);
+            case 'darwin':
+                return join(homeDir, 'Library', 'Caches', name);
+            case 'win32':
+                return join(process.env.LOCALAPPDATA ?? join(homeDir, 'AppData', 'Local'), name);
+            default:
+                return join(process.env.XDG_CACHE_HOME ?? join(homeDir, '.cache'), name);
         }
     }
 
@@ -181,7 +184,7 @@ export class SamsungTvRemote {
     }
 
     private refreshWebSocketURL(): void {
-        let url = (this.options.port === 8001) ? 'ws' : 'wss';
+        let url = this.options.port === 8001 ? 'ws' : 'wss';
         url += `://${this.options.ip}:${this.options.port}/api/v2/channels/samsung.remote.control`;
         url += `?name=${Buffer.from(this.options.name).toString('base64')}`;
         if (this.token) {
@@ -191,8 +194,8 @@ export class SamsungTvRemote {
     }
 
     private async isTvAlive(): Promise<boolean> {
-        return new Promise((resolve) => {
-            exec(`ping -c 1 -W 1 ${this.options.ip}`, (error) => resolve(!!!error));
+        return new Promise(resolve => {
+            exec(`ping -c 1 -W 1 ${this.options.ip}`, error => resolve(!!!error));
         });
     }
 
@@ -204,11 +207,11 @@ export class SamsungTvRemote {
                 timeout: this.options.timeout,
                 rejectUnauthorized: false
             });
-            ws.on('error', (error) => {
+            ws.on('error', error => {
                 ws.close();
                 return reject(error.message);
             });
-            ws.on('message', (data) => {
+            ws.on('message', data => {
                 const msg = JSON.parse(data.toString());
                 if (msg.event === 'ms.channel.connect') {
                     // Register app for next time
@@ -225,4 +228,4 @@ export class SamsungTvRemote {
             });
         });
     }
-};
+}
