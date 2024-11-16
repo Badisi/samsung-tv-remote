@@ -35,13 +35,7 @@ export class SamsungTvRemote {
         this.logger.log('Options:', this.options);
 
         // Retrieve app token (if previously registered)
-        const apps = this.getRegisteredApps();
-        if (Object.prototype.hasOwnProperty.call(apps, this.options.name)) {
-            this.token = apps[this.options.name];
-            this.logger.log('Token found:', this.token);
-        } else {
-            this.logger.warn('No token found:', 'app is not registered yet and will need to be authorized on TV');
-        }
+        this.checkAppRegistration(this.options.ip, this.options.port, this.options.name);
 
         // Initialize web socket url
         this.refreshWebSocketURL();
@@ -139,7 +133,7 @@ export class SamsungTvRemote {
         }
     }
 
-    private getRegisteredApps(): Record<string, string> {
+    private getRegisteredApps(): Record<string, Record<string, string>> {
         const filePath = this.getCachePath();
         if (existsSync(filePath)) {
             return JSON.parse(readFileSync(filePath).toString());
@@ -147,13 +141,44 @@ export class SamsungTvRemote {
         return {};
     }
 
-    private registerApp(appName: string, appToken: string): void {
+    private registerApp(ip: string, port: number, appName: string, appToken: string): void {
         const filePath = this.getCachePath();
-
         const apps = this.getRegisteredApps();
-        apps[appName] = appToken;
+        /**
+         *  Saving format was improved in v2.2.0 so that an app can be linked to multiple tv's token:
+         *    { appName: { `ip:port`: appToken, `ip2:port2`: appToken } }
+         *  However, old format could still be in use and needs to be addressed:
+         *    { appName: appToken }
+         */
+        if (apps[appName] && typeof apps[appName] === 'string') {
+            apps[appName] = {};
+        }
+        /* */
+        apps[appName] ??= {};
+        apps[appName][`${ip}:${String(port)}`] = appToken;
         writeFileSync(filePath, JSON.stringify(apps));
-    };
+    }
+
+    private checkAppRegistration(ip: string, port: number, appName: string): void {
+        const apps = this.getRegisteredApps();
+        this.token = undefined;
+
+        if (Object.prototype.hasOwnProperty.call(apps, appName)) {
+            // Old format -> needs to be patched
+            if (typeof apps[appName] === 'string') {
+                this.token = apps[appName] as unknown as string;
+                this.registerApp(ip, port, appName, this.token);
+            } else if (Object.prototype.hasOwnProperty.call(apps[appName], `${ip}:${String(port)}`)) {
+                this.token = apps[appName][`${ip}:${String(port)}`];
+            }
+        }
+
+        if (this.token) {
+            this.logger.log('Token found:', this.token);
+        } else {
+            this.logger.warn('No token found:', 'app is not registered yet and will need to be authorized on TV');
+        }
+    }
 
     private refreshWebSocketURL(): void {
         let url = (this.options.port === 8001) ? 'ws' : 'wss';
@@ -190,7 +215,7 @@ export class SamsungTvRemote {
                     if (!this.token) {
                         this.token = msg.data.token;
                         this.refreshWebSocketURL();
-                        this.registerApp(this.options.name, msg.data.token);
+                        this.registerApp(this.options.ip, this.options.port, this.options.name, msg.data.token);
                     }
                     return resolve(ws);
                 } else {
