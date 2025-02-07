@@ -18,6 +18,9 @@
         },
         "./package.json": "./package.json"
     },
+    "bin": {
+        "samsung-tv-remote": "./src/cli.js"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/badisi/samsung-tv-remote.git"
