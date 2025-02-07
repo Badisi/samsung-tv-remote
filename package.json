@@ -28,7 +28,7 @@
         "remote"
     ],
     "scripts": {
-        "ncu": "npx npm-check-updates -i --format=group --packageFile '{,projects/**/}package.json'",
+        "ncu": "npx npm-check-updates -i --format=group --packageFile '{,projects/**/}package.json' --no-deprecated",
         "build": "node ./build.mjs",
         "test:cjs": "node ./tests/test.cjs",
         "test:mjs": "node ./tests/test.mjs",
