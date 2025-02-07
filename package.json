@@ -40,13 +40,13 @@
     },
     "devDependencies": {
         "@colors/colors": "^1.6.0",
-        "@types/node": "^22.9.0",
+        "@types/node": "^22.13.1",
         "@types/wake_on_lan": "^0.0.33",
-        "@types/ws": "^8.5.13",
+        "@types/ws": "^8.5.14",
         "cpy": "^11.1.0",
-        "typescript": "^5.6.3"
+        "typescript": "^5.7.3"
     },
     "optionalDependencies": {
-        "bufferutil": "^4.0.8"
+        "bufferutil": "^4.0.9"
     }
 }
