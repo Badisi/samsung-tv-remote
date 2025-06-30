@@ -36,11 +36,11 @@
     },
     "dependencies": {
         "wake_on_lan": "^1.0.0",
-        "ws": "^8.18.1"
+        "ws": "^8.18.3"
     },
     "devDependencies": {
         "@colors/colors": "^1.6.0",
-        "@types/node": "^22.15.2",
+        "@types/node": "^24.0.7",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.18.1",
         "cpy": "^11.1.0",
