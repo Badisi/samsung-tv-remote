@@ -28,6 +28,7 @@
 ✅ Wake TV from sleep mode thanks to `Wake-on-LAN (WoL)`<br/>
 ✅ Send `one` or `multiple` keys at once to the TV<br/>
 ✅ [`241`](https://github.com/badisi/samsung-tv-remote/blob/main/src/keys.ts) known keys already predefined<br/>
+✅ Works as a library and as a cli tool<br/>
 
 
 ## Installation
@@ -40,7 +41,13 @@ npm install samsung-tv-remote --save
 yarn add samsung-tv-remote
 ```
 
-## Usage
+## Usage as cli
+
+```sh
+npx samsung-tv-remote
+```
+
+## Usage as a library
 
 __Example__
 
