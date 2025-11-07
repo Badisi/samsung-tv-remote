@@ -299,9 +299,9 @@ The content of the commit message body should contain:
 
 
 
-[coc]: https://github.com/badisi/samsung-tv-remote/blob/main/CODE_OF_CONDUCT.md
-[github]: https://github.com/badisi/samsung-tv-remote
-[issue-templates]: https://github.com/badisi/samsung-tv-remote/issues/new/choose
-[github-pr]: https://github.com/badisi/samsung-tv-remote/pulls
+[coc]: https://github.com/Badisi/samsung-tv-remote/blob/main/CODE_OF_CONDUCT.md
+[github]: https://github.com/Badisi/samsung-tv-remote
+[issue-templates]: https://github.com/Badisi/samsung-tv-remote/issues/new/choose
+[github-pr]: https://github.com/Badisi/samsung-tv-remote/pulls
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
 [commit-message-format]: https://www.conventionalcommits.org/en/v1.0.0

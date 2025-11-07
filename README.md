@@ -11,12 +11,12 @@
         <img src="https://img.shields.io/npm/v/samsung-tv-remote.svg?color=blue&logo=npm" alt="npm version" /></a>
     <a href="https://npmcharts.com/compare/samsung-tv-remote?minimal=true">
         <img src="https://img.shields.io/npm/dw/samsung-tv-remote.svg?color=7986CB&logo=npm" alt="npm donwloads" /></a>
-    <a href="https://github.com/badisi/samsung-tv-remote/blob/main/LICENSE">
+    <a href="https://github.com/Badisi/samsung-tv-remote/blob/main/LICENSE">
         <img src="https://img.shields.io/npm/l/samsung-tv-remote.svg?color=ff69b4" alt="license" /></a>
 </p>
 
 <p align="center">
-    <a href="https://github.com/badisi/samsung-tv-remote/blob/main/CONTRIBUTING.md#-submitting-a-pull-request-pr">
+    <a href="https://github.com/Badisi/samsung-tv-remote/blob/main/CONTRIBUTING.md#-submitting-a-pull-request-pr">
         <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" /></a>
 </p>
 
@@ -27,7 +27,7 @@
 ✅ Support **Samsung SmartTV** from `2016+`<br/>
 ✅ Wake TV from sleep mode thanks to `Wake-on-LAN (WoL)`<br/>
 ✅ Send `one` or `multiple` keys at once to the TV<br/>
-✅ [`241`](https://github.com/badisi/samsung-tv-remote/blob/main/src/keys.ts) known keys already predefined<br/>
+✅ [`241`](https://github.com/Badisi/samsung-tv-remote/blob/main/src/keys.ts) known keys already predefined<br/>
 ✅ Works as a library and as a cli tool<br/>
 
 
@@ -178,7 +178,7 @@ Please read and follow the [Code of Conduct][codeofconduct] and help me keep thi
 
 
 
-[clipreview]: https://github.com/badisi/samsung-tv-remote/blob/main/cli_preview.png
-[developer]: https://github.com/badisi/samsung-tv-remote/blob/main/DEVELOPER.md
-[contributing]: https://github.com/badisi/samsung-tv-remote/blob/main/CONTRIBUTING.md
-[codeofconduct]: https://github.com/badisi/samsung-tv-remote/blob/main/CODE_OF_CONDUCT.md
+[clipreview]: https://github.com/Badisi/samsung-tv-remote/blob/main/cli_preview.png
+[developer]: https://github.com/Badisi/samsung-tv-remote/blob/main/DEVELOPER.md
+[contributing]: https://github.com/Badisi/samsung-tv-remote/blob/main/CONTRIBUTING.md
+[codeofconduct]: https://github.com/Badisi/samsung-tv-remote/blob/main/CODE_OF_CONDUCT.md

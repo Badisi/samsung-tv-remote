@@ -6,9 +6,7 @@ on:
 
 jobs:
   ci_release:
-    uses: badisi/actions/.github/workflows/action.yml@v2
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    uses: badisi/actions/.github/workflows/action.yml@v4
     with:
       build: true
       release: true

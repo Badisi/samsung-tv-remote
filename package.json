@@ -2,7 +2,7 @@
     "name": "samsung-tv-remote",
     "version": "2.2.2",
     "description": "Remote client for Samsung SmartTV starting from 2016",
-    "homepage": "https://github.com/badisi/samsung-tv-remote",
+    "homepage": "https://github.com/Badisi/samsung-tv-remote",
     "license": "MIT",
     "author": {
         "name": "Badisi"
@@ -23,7 +23,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/badisi/samsung-tv-remote.git"
+        "url": "https://github.com/Badisi/samsung-tv-remote"
     },
     "keywords": [
         "samsung",
