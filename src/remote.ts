@@ -1,9 +1,8 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { exec } from 'child_process';
-import { homedir } from 'os';
-import { join } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { exec } from 'node:child_process';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 import { wake } from 'wake_on_lan';
-
 import WebSocket from 'ws';
 
 import type { SamsungTvRemoteOptions } from './options';
@@ -109,7 +108,7 @@ export class SamsungTvRemote {
                             if (!(await this.isTvAlive())) {
                                 const msg = "TV won't wake up";
                                 this.logger.error(msg);
-                                return reject(new Error(`[SamsungTvRemote]: Error: ${msg}`));
+                                return reject(new Error(`[SamsungTvRemote]: ${msg}`));
                             }
                             return resolve();
                         }, 5000);

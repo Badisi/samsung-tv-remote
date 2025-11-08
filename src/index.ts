@@ -5,9 +5,9 @@
  *  @author Badisi
  *  @license Released under the MIT license
  *
- *  https://github.com/badisi/samsung-tv-remote
+ *  https://github.com/Badisi/samsung-tv-remote
  */
 
+export { Keys } from './keys';
 export type { SamsungTvRemoteOptions } from './options';
 export { SamsungTvRemote } from './remote';
-export { Keys } from './keys';

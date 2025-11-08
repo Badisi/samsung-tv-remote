@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/naming-convention, no-underscore-dangle */
 
 import colors from '@colors/colors/safe.js';
-import { existsSync, mkdirSync, rmSync, readFileSync, writeFileSync } from 'fs';
-import { dirname, resolve as pathResolve } from 'path';
-import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import cpy from 'cpy';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { dirname, resolve as pathResolve } from 'path';
+import { fileURLToPath } from 'url';
 
 const { green, magenta } = colors;
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,9 +37,10 @@ const cleanDir = path => new Promise(resolve => {
 });
 
 const copyAssets = async () => {
+    await cpy('bin', pathResolve(DIST_PATH, 'bin'), { flat: false });
+    await cpy('package.json', DIST_PATH, { flat: true });
     await cpy('README.md', DIST_PATH, { flat: true });
     await cpy('LICENSE', DIST_PATH, { flat: true });
-    await cpy('package.json', DIST_PATH, { flat: true });
 };
 
 const customizePackageJson = () => {

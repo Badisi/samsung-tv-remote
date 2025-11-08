@@ -1,5 +1,4 @@
 export const Keys = {
-
     KEY_0: 'KEY_0',
     KEY_1: 'KEY_1',
     KEY_2: 'KEY_2',
@@ -242,4 +241,4 @@ export const Keys = {
     KEY_ZOOM_IN: 'KEY_ZOOM_IN',
     KEY_ZOOM_MOVE: 'KEY_ZOOM_MOVE',
     KEY_ZOOM_OUT: 'KEY_ZOOM_OUT',
-};
+} as const;
