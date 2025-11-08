@@ -25,13 +25,27 @@
 ## Features
 
 ✅ Support **Samsung SmartTV** from `2016+`<br/>
-✅ Wake TV from sleep mode thanks to `Wake-on-LAN (WoL)`<br/>
-✅ Send `one` or `multiple` keys at once to the TV<br/>
-✅ [`241`](https://github.com/Badisi/samsung-tv-remote/blob/main/src/keys.ts) known keys already predefined<br/>
-✅ Works as a library and as a cli tool<br/>
+✅ Detect any Samsung TVs awake on the network<br/>
+✅ Wake a TV from sleep mode - thanks to `Wake-on-LAN (WoL)`<br/>
+✅ Send `one` or `multiple` keys at once to a TV<br/>
+✅ [`241`][keys] known keys already predefined<br/>
+✅ Works as a `library` and as a `CLI` tool<br/>
 
 
-## Installation
+## Command line tool
+
+The CLI utility provides an interactive way to control your TV remotely.
+
+```sh
+npx samsung-tv-remote
+```
+
+![CLI utility preview][clipreview]
+
+
+## As a package
+
+__Installation__
 
 ```sh
 npm install samsung-tv-remote --save
@@ -41,84 +55,99 @@ npm install samsung-tv-remote --save
 yarn add samsung-tv-remote
 ```
 
-## Usage as cli
-
-```sh
-npx samsung-tv-remote
-```
-
-## Usage as a library
-
 __Example__
 
 ```ts
 /** CommonJS */
-// const { SamsungTvRemote, Keys } = require('samsung-tv-remote');
+// const { getAwakeSamsungDevices, Keys, SamsungTvRemote, getLastConnectedDevice } = require('samsung-tv-remote');
 
 /** ESM / Typescript */
-import { SamsungTvRemote, Keys } from 'samsung-tv-remote';
+import { getAwakeSamsungDevices, getLastConnectedDevice, Keys, SamsungTvRemote } from 'samsung-tv-remote';
 
-const main = async () => {
-    const remote = new SamsungTvRemote({
-        ip: '192.168.1.111',
-        mac: 'fc:03:9f:0d:72:37'
-    });
-    await remote.wakeTV();
-    await remote.sendKey(Keys.KEY_DOWN);
-    await remote.sendKeys([Keys.KEY_POWER]);
-};
-main().catch(console.error);
+(async () => {
+    let device = getLastConnectedDevice();
+    if (!device) {
+        const devices = await getAwakeSamsungDevices();
+        if (devices.length) {
+            device = devices[0];
+        }
+    }
+    if (device) {
+        try {
+            const remote = new SamsungTvRemote({ device });
+            await remote.wakeTV();
+            await remote.sendKey(Keys.KEY_DOWN);
+            await remote.sendKeys([Keys.KEY_POWER])
+            remote.disconnect();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+})();
 ```
 
 __Options__
 
 ```ts
-interface SamsungTvRemoteOptions {
+export interface SamsungTvRemoteOptions {
     /**
-     * IP address of the TV.
+     * IP address of the TV to connect to.
      */
     ip: string;
 
     /**
-     * MAC address of the TV.
+     * MAC address of the TV to connect to.
+     *
      * Required only when using the 'wakeTV()' api.
      *
      * @default 00:00:00:00:00:00
      */
-    mac?: string,
+    mac?: string;
+
+    /**
+     * A Samsung device to connect to.
+     *
+     * To be used in replacement of `ip` and `mac` options.
+     */
+    device?: SamsungDevice;
 
     /**
      * Name under which the TV will recognize your program.
+     *
      * - It will be displayed on TV, the first time you run your program, as a 'device' trying to connect.
      * - It will also be used by this library to persist a token on the operating system running your program,
      *   so that no further consent are asked by the TV after the first run.
      *
      * @default SamsungTvRemote
      */
-    name?: string,
+    name?: string;
 
     /**
      * Port address used for remote control emulation protocol.
+     *
      * Different ports are used in different TV models.
-     * It could be: 55000 (legacy), 8001 (2016+) or 8002 (2018+).
+     * @example 55000 (legacy), 8001 (2016+) or 8002 (2018+).
      *
      * @default 8002
      */
-    port?: number,
+    port?: number;
 
     /**
-     * Milliseconds before the connection to the TV times out.
+     * Delay in milliseconds before the connection to the TV times out.
      *
-     * @default 1000
+     * @default 5000
      */
     timeout?: number;
 
     /**
-     * Enables more detailed output.
+     * Delay in milliseconds between sending key commands.
      *
-     * @default false
+     * Some TV models or applications may drop key events if they are sent too quickly.
+     * Introducing a delay helps ensure reliable key interactions.
+     *
+     * @default 60
      */
-    debug?: boolean;
+    keysDelay?: number;
 }
 ```
 
@@ -127,21 +156,57 @@ __Apis__
 ```ts
 class SamsungTvRemote {
     /**
-     * Turn the TV on or awaken it from sleep mode (also called WoL - Wake-on-LAN).
+     * Turns the TV on or awaken it from sleep mode (also called WoL - Wake-on-LAN).
+     *
      * The mac address option is required in this case.
      */
     wakeTV(): Promise<void>;
 
     /**
-     * Send a key to the TV.
+     * Sends a key to the TV.
      */
-    sendKey(key: Keys): Promise<void>;
+    sendKey(key: keyof typeof Keys): Promise<void>;
 
     /**
-     * Send multiple keys to the TV.
+     * Sends multiple keys to the TV.
      */
-    sendKeys(key: Keys[]): Promise<void>;
+    sendKeys(key: (keyof typeof Keys)[]): Promise<void>;
+
+    /**
+     * Closes the connection to the TV.
+     *
+     * It doesn't shut down the TV - it only closes the connection to it.
+     */
+    disconnect(): void;
 }
+```
+
+__Helpers__
+
+```ts
+/**
+ * Searches for last connected device, if any.
+ */
+getLastConnectedDevice(): SamsungDevice | undefined;
+
+/**
+ * Retrieves a list of Samsung devices that are currently awake and reachable on the network.
+ */
+getAwakeSamsungDevices(timeout = 500): Promise<SamsungDevice[]>;
+```
+
+
+## Debug
+
+You can enable **verbose mode** to help debug your program.
+
+Set the `LOG_LEVEL` environment variable to one of the supported values: `none`, `debug`, `info`, `warn`, `error`.
+
+#### Example
+
+```sh
+# Run your program in debug mode
+LOG_LEVEL=debug npm run yourprogram
 ```
 
 
@@ -178,6 +243,7 @@ Please read and follow the [Code of Conduct][codeofconduct] and help me keep thi
 
 
 
+[keys]: https://github.com/Badisi/samsung-tv-remote/blob/main/src/keys.ts
 [clipreview]: https://github.com/Badisi/samsung-tv-remote/blob/main/cli_preview.png
 [developer]: https://github.com/Badisi/samsung-tv-remote/blob/main/DEVELOPER.md
 [contributing]: https://github.com/Badisi/samsung-tv-remote/blob/main/CONTRIBUTING.md

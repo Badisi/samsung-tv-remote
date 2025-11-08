@@ -1,12 +1,23 @@
-import { SamsungTvRemote, Keys } from '../dist/src/index.js';
+// @ts-check
 
-const main = async () => {
-    const remote = new SamsungTvRemote({
-        ip: '192.168.1.111',
-        mac: 'fc:03:9f:0d:72:37',
-        debug: true
-    });
-    await remote.wakeTV();
-    await remote.sendKey(Keys.KEY_DOWN);
-};
-main().catch(console.error);
+import { getAwakeSamsungDevices, getLastConnectedDevice, Keys, SamsungTvRemote } from '../dist/index.js';
+
+(async () => {
+    let device = getLastConnectedDevice();
+    if (!device) {
+        const devices = await getAwakeSamsungDevices();
+        if (devices.length) {
+            device = devices[0];
+        }
+    }
+    if (device) {
+        try {
+            const remote = new SamsungTvRemote({ device });
+            await remote.wakeTV();
+            await remote.sendKeys([Keys.KEY_RIGHT, Keys.KEY_RIGHT, Keys.KEY_RIGHT, Keys.KEY_RIGHT]);
+            remote.disconnect();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+})();

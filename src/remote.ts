@@ -1,50 +1,62 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { exec } from 'child_process';
-import { homedir } from 'os';
-import { join } from 'path';
+import { exec } from 'node:child_process';
 import { wake } from 'wake_on_lan';
-
 import WebSocket from 'ws';
+import { getAppFromCache, saveAppToCache, saveDeviceToCache } from './cache';
+import type { Keys } from './keys';
+import { createLogger } from './logger';
+import type { SamsungTvRemoteOptions } from './models';
 
-import type { SamsungTvRemoteOptions } from './options';
-import { SamsungTvLogger } from './logger';
-import { Keys } from './keys';
+const logger = createLogger();
+
+const DEFAULT_OPTIONS: Required<Omit<SamsungTvRemoteOptions, 'ip' | 'device'>> = {
+    name: 'SamsungTvRemote',
+    mac: '00:00:00:00:00:00',
+    port: 8002,
+    timeout: 5000,
+    keysDelay: 60
+};
 
 export class SamsungTvRemote {
-    private logger = new SamsungTvLogger();
+    #options!: Required<Omit<SamsungTvRemoteOptions, 'device'>> & Partial<Pick<SamsungTvRemoteOptions, 'device'>>;
+    #connectingPromise: Promise<void> | null = null;
+    #webSocketURL!: string;
+    #webSocket: WebSocket | null = null;
+    #appToken?: string;
 
-    private options!: Required<SamsungTvRemoteOptions>;
-    private wsURL!: string;
-    private token?: string;
-
+    constructor(options: Omit<SamsungTvRemoteOptions, 'device'>);
+    constructor(options: Omit<SamsungTvRemoteOptions, 'ip' | 'mac'>);
     constructor(options: SamsungTvRemoteOptions) {
-        if (!options.ip) {
-            throw new Error('[SamsungTvRemote]: TV IP address is required');
+        // Initialize
+        this.#options = {
+            // @ts-expect-error This is made only for keys ordering during the logs
+            name: undefined,
+            // @ts-expect-error This is made only for keys ordering during the logs
+            ip: undefined,
+            ...DEFAULT_OPTIONS,
+            ...options
+        };
+        if (options.device) {
+            this.#options.ip = options.device.ip;
+            this.#options.mac = options.device.mac;
+        }
+        if (!this.#options.ip) {
+            throw new Error('TV IP address is required');
         }
 
-        // Initialize
-        this.options = {
-            name: options.name ?? 'SamsungTvRemote',
-            ip: options.ip,
-            mac: options.mac ?? '00:00:00:00:00:00',
-            port: options.port ?? 8002,
-            timeout: options.timeout ?? 1000,
-            debug: options.debug ?? false
-        };
-        this.logger.enabled(this.options.debug);
-        this.logger.log('Options:', this.options);
+        logger.info('Remote starting...');
+        logger.debug(this.#options);
 
         // Retrieve app token (if previously registered)
-        this.checkAppRegistration(this.options.ip, this.options.port, this.options.name);
+        this.#appToken = this.#getAppToken(this.#options.ip, this.#options.port, this.#options.name);
 
         // Initialize web socket url
-        this.refreshWebSocketURL();
+        this.#refreshWebSocketURL();
     }
 
     // --- PUBLIC API(s) ---
 
     /**
-     * Send a key to the TV.
+     * Sends a key to the TV.
      *
      * @async
      * @param {keyof typeof Keys} key The key to be sent
@@ -52,31 +64,28 @@ export class SamsungTvRemote {
      */
     public async sendKey(key: keyof typeof Keys): Promise<void> {
         if (key) {
-            const command = JSON.stringify({
-                method: 'ms.remote.control',
-                params: {
-                    Cmd: 'Click',
-                    DataOfCmd: key,
-                    Option: false,
-                    TypeOfRemote: 'SendRemoteKey'
-                }
-            });
-            const ws = await this.connect().catch(err => this.logger.error(err));
-            if (ws) {
-                this.logger.log('Sending key:', key);
+            await this.#connectToTV();
 
-                if (this.options.port === 8001) {
-                    setTimeout(() => ws.send(command), 1000);
-                } else {
-                    ws.send(command);
-                    setTimeout(() => ws.close(), 250);
-                }
-            }
+            logger.info('📡 Sending key...', key);
+            this.#webSocket?.send(
+                JSON.stringify({
+                    method: 'ms.remote.control',
+                    params: {
+                        Cmd: 'Click',
+                        DataOfCmd: key,
+                        Option: false,
+                        TypeOfRemote: 'SendRemoteKey'
+                    }
+                })
+            );
+
+            // Gives a delay before the next command
+            await this.#delay(this.#options.keysDelay);
         }
     }
 
     /**
-     * Send multiple keys to the TV.
+     * Sends multiple keys to the TV.
      *
      * @async
      * @param {(keyof typeof Keys)[]} keys An array of keys to be sent
@@ -89,143 +98,173 @@ export class SamsungTvRemote {
     }
 
     /**
-     * Turn the TV on or awaken it from sleep mode (also called WoL - Wake-on-LAN).
+     * Turns the TV on or awaken it from sleep mode (also called WoL - Wake-on-LAN).
+     *
      * The mac address option is required in this case.
      *
      * @async
      * @returns {Promise<void>} A void promise
      */
     public async wakeTV(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            if (!(await this.isTvAlive())) {
-                this.logger.log('Waking TV...');
-                wake(this.options.mac, { num_packets: 30 }, async (error: Error) => {
-                    if (error) {
-                        this.logger.error(error);
-                        return reject(error);
-                    } else {
-                        // Gives a little time for the TV to start
-                        setTimeout(async () => {
-                            if (!(await this.isTvAlive())) {
-                                const msg = "TV won't wake up";
-                                this.logger.error(msg);
-                                return reject(new Error(`[SamsungTvRemote]: Error: ${msg}`));
-                            }
-                            return resolve();
-                        }, 5000);
-                    }
-                });
-            } else {
-                this.logger.log('Waking TV:', 'already up');
-                return resolve();
-            }
+        if (await this.#isTvAlive()) {
+            logger.info('💤 Waking TV... already up');
+            return;
+        }
+
+        logger.info('💤 Waking TV...');
+
+        if (!this.#options.mac) {
+            throw new Error('TV mac address is required');
+        }
+
+        return new Promise<void>((resolve, reject) => {
+            wake(this.#options.mac, { num_packets: 30 }, async (error: Error) => {
+                if (error) {
+                    return reject(error);
+                } else {
+                    // Gives a little time for the TV to start
+                    setTimeout(async () => {
+                        if (!(await this.#isTvAlive())) {
+                            return reject(new Error("TV won't wake up"));
+                        }
+                        return resolve();
+                    }, 5000);
+                }
+            });
         });
+    }
+
+    /**
+     * Closes the connection to the TV.
+     *
+     * It doesn't shut down the TV - it only closes the connection to it.
+     */
+    public disconnect(): void {
+        logger.info('📺 Disconnecting from TV...');
+        this.#disconnectFromTV();
     }
 
     // --- HELPER(s) ---
 
-    private getCachePath(name = 'badisi-samsung-tv-remote.json'): string {
-        const homeDir = homedir();
-        switch (process.platform) {
-            case 'darwin':
-                return join(homeDir, 'Library', 'Caches', name);
-            case 'win32':
-                return join(process.env.LOCALAPPDATA ?? join(homeDir, 'AppData', 'Local'), name);
-            default:
-                return join(process.env.XDG_CACHE_HOME ?? join(homeDir, '.cache'), name);
-        }
+    async #delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    private getRegisteredApps(): Record<string, Record<string, string>> {
-        const filePath = this.getCachePath();
-        if (existsSync(filePath)) {
-            return JSON.parse(readFileSync(filePath).toString());
-        }
-        return {};
-    }
+    #getAppToken(ip: string, port: number, appName: string): string | undefined {
+        let value: string | undefined;
 
-    private registerApp(ip: string, port: number, appName: string, appToken: string): void {
-        const filePath = this.getCachePath();
-        const apps = this.getRegisteredApps();
-        /**
-         *  Saving format was improved in v2.2.0 so that an app can be linked to multiple tv's token:
-         *    { appName: { `ip:port`: appToken, `ip2:port2`: appToken } }
-         *  However, old format could still be in use and needs to be addressed:
-         *    { appName: appToken }
-         */
-        if (apps[appName] && typeof apps[appName] === 'string') {
-            apps[appName] = {};
-        }
-        /* */
-        apps[appName] ??= {};
-        apps[appName][`${ip}:${String(port)}`] = appToken;
-        writeFileSync(filePath, JSON.stringify(apps));
-    }
-
-    private checkAppRegistration(ip: string, port: number, appName: string): void {
-        const apps = this.getRegisteredApps();
-        this.token = undefined;
-
-        if (Object.prototype.hasOwnProperty.call(apps, appName)) {
-            // Old format -> needs to be patched
-            if (typeof apps[appName] === 'string') {
-                this.token = apps[appName] as unknown as string;
-                this.registerApp(ip, port, appName, this.token);
-            } else if (Object.prototype.hasOwnProperty.call(apps[appName], `${ip}:${String(port)}`)) {
-                this.token = apps[appName][`${ip}:${String(port)}`];
-            }
+        const app = getAppFromCache(appName);
+        if (app && typeof app === 'object' && Object.hasOwn(app, `${ip}:${String(port)}`)) {
+            value = app[`${ip}:${String(port)}`];
         }
 
-        if (this.token) {
-            this.logger.log('Token found:', this.token);
+        if (value) {
+            logger.info('✅ App token found:', value);
         } else {
-            this.logger.warn('No token found:', 'app is not registered yet and will need to be authorized on TV');
+            logger.warn('No token found: app is not registered yet and will need to be authorized on TV');
         }
+
+        return value;
     }
 
-    private refreshWebSocketURL(): void {
-        let url = this.options.port === 8001 ? 'ws' : 'wss';
-        url += `://${this.options.ip}:${this.options.port}/api/v2/channels/samsung.remote.control`;
-        url += `?name=${Buffer.from(this.options.name).toString('base64')}`;
-        if (this.token) {
-            url += `&token=${this.token}`;
+    #refreshWebSocketURL(): void {
+        let url = this.#options.port === 8001 ? 'ws' : 'wss';
+        url += `://${this.#options.ip}:${this.#options.port}/api/v2/channels/samsung.remote.control`;
+        url += `?name=${Buffer.from(this.#options.name).toString('base64')}`;
+        if (this.#appToken) {
+            url += `&token=${this.#appToken}`;
         }
-        this.wsURL = url;
+        this.#webSocketURL = url;
     }
 
-    private async isTvAlive(): Promise<boolean> {
+    async #isTvAlive(): Promise<boolean> {
         return new Promise(resolve => {
-            exec(`ping -c 1 -W 1 ${this.options.ip}`, error => resolve(!!!error));
+            exec(`ping -c 1 -W 1 ${this.#options.ip}`, error => resolve(!error));
         });
     }
 
-    private connect(): Promise<WebSocket> {
-        return new Promise((resolve, reject) => {
-            this.logger.log('Connecting to TV:', this.wsURL);
+    #disconnectFromTV(): void {
+        this.#webSocket?.removeAllListeners();
+        this.#webSocket?.close();
+        this.#webSocket = null;
+        this.#connectingPromise = null;
+    }
 
-            const ws = new WebSocket(this.wsURL, {
-                timeout: this.options.timeout,
+    async #connectToTV(): Promise<void> {
+        // If already connected -> returns immediately
+        if (this.#webSocket?.readyState === WebSocket.OPEN) {
+            return Promise.resolve();
+        }
+
+        // If already in progress -> returns the promise
+        if (this.#connectingPromise) {
+            return this.#connectingPromise;
+        }
+
+        // Otherwise -> starts new connection
+        this.#connectingPromise = new Promise((resolve, reject) => {
+            logger.info('📺 Connecting to TV...');
+            logger.debug('Using websocket:', this.#webSocketURL);
+
+            const _webSocket = new WebSocket(this.#webSocketURL, {
+                timeout: this.#options.timeout,
+                handshakeTimeout: this.#options.timeout,
                 rejectUnauthorized: false
             });
-            ws.on('error', error => {
-                ws.close();
-                return reject(error.message);
-            });
-            ws.on('message', data => {
-                const msg = JSON.parse(data.toString());
-                if (msg.event === 'ms.channel.connect') {
-                    // Register app for next time
-                    if (!this.token) {
-                        this.token = msg.data.token;
-                        this.refreshWebSocketURL();
-                        this.registerApp(this.options.ip, this.options.port, this.options.name, msg.data.token);
-                    }
-                    return resolve(ws);
+
+            const cleanup = () => {
+                _webSocket?.removeAllListeners();
+                this.#connectingPromise = null;
+            };
+
+            _webSocket.on('error', (error: NodeJS.ErrnoException) => {
+                cleanup();
+                this.#disconnectFromTV();
+                if (error.code === 'ETIMEDOUT') {
+                    reject(new Error('Connection timed out'));
+                } else if (error.code === 'EHOSTDOWN') {
+                    reject(new Error('Host is down or service not available'));
+                } else if (error.code === 'EHOSTUNREACH') {
+                    reject(new Error('Host is unreachable'));
                 } else {
-                    ws.close();
-                    return reject(msg);
+                    reject(error);
+                }
+            });
+
+            _webSocket.on('close', () => {
+                cleanup();
+                this.#webSocket = null;
+            });
+
+            _webSocket.once('message', data => {
+                const message = JSON.parse(data.toString());
+                if (message.event === 'ms.channel.connect') {
+                    logger.info('✅ Connected to TV');
+
+                    // Save token for next time (if not already in cache)
+                    if (!this.#appToken && message.data?.token) {
+                        this.#appToken = message.data.token;
+                        this.#refreshWebSocketURL();
+                        saveAppToCache(this.#options.ip, this.#options.port, this.#options.name, message.data.token);
+                    }
+
+                    // Save device for next time
+                    const deviceName = this.#options.device?.friendlyName ?? 'Unknown';
+                    saveDeviceToCache(this.#options.ip, this.#options.mac, deviceName);
+
+                    this.#webSocket = _webSocket;
+                    cleanup();
+                    resolve();
+                } else {
+                    throw new Error(`Unexpected handshake message: ${data.toString()}`);
                 }
             });
         });
+
+        try {
+            await this.#connectingPromise;
+        } finally {
+            this.#connectingPromise = null;
+        }
     }
 }

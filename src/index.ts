@@ -5,9 +5,10 @@
  *  @author Badisi
  *  @license Released under the MIT license
  *
- *  https://github.com/badisi/samsung-tv-remote
+ *  https://github.com/Badisi/samsung-tv-remote
  */
 
-export type { SamsungTvRemoteOptions } from './options';
-export { SamsungTvRemote } from './remote';
+export { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery';
 export { Keys } from './keys';
+export type { SamsungDevice, SamsungTvRemoteOptions } from './models';
+export { SamsungTvRemote } from './remote';

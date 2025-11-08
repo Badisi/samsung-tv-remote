@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/naming-convention, no-underscore-dangle */
-
+import { exec } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, resolve as pathResolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import colors from '@colors/colors/safe.js';
-import { existsSync, mkdirSync, rmSync, readFileSync, writeFileSync } from 'fs';
-import { dirname, resolve as pathResolve } from 'path';
-import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
 import cpy from 'cpy';
 
 const { green, magenta } = colors;
@@ -14,32 +12,38 @@ const DIST_PATH = pathResolve(__dirname, './dist');
 
 const log = str => console.log(magenta(str));
 
-const execCmd = (cmd, opts) => new Promise((resolve, reject) => {
-    exec(cmd, opts, (err, stdout, stderr) => {
-        if (err) {
-            console.error(stdout, stderr);
-            return reject(err);
-        }
-        return resolve(stdout);
+const execCmd = (cmd, opts) =>
+    new Promise((resolve, reject) => {
+        exec(cmd, opts, (err, stdout, stderr) => {
+            if (err) {
+                console.error(stdout, stderr);
+                return reject(err);
+            }
+            return resolve(stdout);
+        });
     });
-});
 
-const cleanDir = path => new Promise(resolve => {
-    const exists = existsSync(path);
-    if (exists) {
-        rmSync(path, { recursive: true, cwd: __dirname });
-    }
-    // Gives time to rmSync to unlock the file on Windows
-    setTimeout(() => {
-        mkdirSync(path, { recursive: true, cwd: __dirname });
-        resolve();
-    }, exists ? 1000 : 0);
-});
+const cleanDir = path =>
+    new Promise(resolve => {
+        const exists = existsSync(path);
+        if (exists) {
+            rmSync(path, { recursive: true, cwd: __dirname });
+        }
+        // Gives time to rmSync to unlock the file on Windows
+        setTimeout(
+            () => {
+                mkdirSync(path, { recursive: true, cwd: __dirname });
+                resolve();
+            },
+            exists ? 1000 : 0
+        );
+    });
 
 const copyAssets = async () => {
+    await cpy('bin', pathResolve(DIST_PATH, 'bin'), { flat: false });
+    await cpy('package.json', DIST_PATH, { flat: true });
     await cpy('README.md', DIST_PATH, { flat: true });
     await cpy('LICENSE', DIST_PATH, { flat: true });
-    await cpy('package.json', DIST_PATH, { flat: true });
 };
 
 const customizePackageJson = () => {
