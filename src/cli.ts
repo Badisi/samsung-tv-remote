@@ -1,5 +1,4 @@
 import { clearScreenDown, createInterface, emitKeypressEvents, moveCursor } from 'node:readline';
-import { cyan, gray, magenta, yellow } from '@colors/colors/safe';
 import { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery';
 import { Keys } from './keys';
 import type { SamsungDevice } from './models';
@@ -38,6 +37,11 @@ const KEYS_MAP: Record<string, keyof typeof Keys> = {
     '\u007f': Keys.KEY_RETURN, // Backspace
     '\u001b': Keys.KEY_HOME // Escape
 };
+
+const cyan = (message: string): string => `\x1b[36m${message}\x1b[0m`;
+const gray = (message: string): string => `\x1b[90m${message}\x1b[0m`;
+const magenta = (message: string): string => `\x1b[35m${message}\x1b[0m`;
+const yellow = (message: string): string => `\x1b[33m${message}\x1b[0m`;
 
 const deviceLabel = (device: SamsungDevice): string =>
     `${device.friendlyName ?? 'Unknown'} ${gray(`(ip: ${device.ip}, mac: ${device.mac})`)}`;
