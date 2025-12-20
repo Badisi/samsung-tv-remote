@@ -44,13 +44,13 @@
     },
     "devDependencies": {
         "@colors/colors": "^1.6.0",
-        "@types/node": "^24.10.0",
+        "@types/node": "^25.0.3",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.18.1",
         "cpy": "^12.1.0",
         "typescript": "^5.9.3"
     },
     "optionalDependencies": {
-        "bufferutil": "^4.0.9"
+        "bufferutil": "^4.1.0"
     }
 }
