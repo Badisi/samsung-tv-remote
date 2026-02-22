@@ -1,16 +1,15 @@
 import { exec } from 'node:child_process';
+import { cp } from 'node:fs/promises';
+import { styleText } from 'node:util';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, resolve as pathResolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import colors from '@colors/colors/safe.js';
-import cpy from 'cpy';
 
-const { green, magenta } = colors;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const DIST_PATH = pathResolve(__dirname, './dist');
 
-const log = str => console.log(magenta(str));
+const log = str => console.log(styleText('magenta', str));
 
 const execCmd = (cmd, opts) =>
     new Promise((resolve, reject) => {
@@ -40,10 +39,10 @@ const cleanDir = path =>
     });
 
 const copyAssets = async () => {
-    await cpy('bin', pathResolve(DIST_PATH, 'bin'), { flat: false });
-    await cpy('package.json', DIST_PATH, { flat: true });
-    await cpy('README.md', DIST_PATH, { flat: true });
-    await cpy('LICENSE', DIST_PATH, { flat: true });
+    await cp('bin', pathResolve(DIST_PATH, 'bin'), { recursive: true });
+    await cp('package.json', pathResolve(DIST_PATH, 'package.json'));
+    await cp('README.md', pathResolve(DIST_PATH, 'README.md'));
+    await cp('LICENSE', pathResolve(DIST_PATH, 'LICENSE'));
 };
 
 const customizePackageJson = () => {
@@ -67,7 +66,7 @@ const build = async () => {
     log('> Customizing package.json..');
     customizePackageJson();
 
-    log(`> ${green('Done!')}\n`);
+    log(`> ${styleText('green', 'Done!')}\n`);
 };
 
 void (async () => {
