@@ -3,7 +3,7 @@ export const createLogger = (
     level: 'none' | 'debug' | 'info' | 'warn' | 'error' = 'none'
 ) => {
     const _level = level !== 'none' ? level : (process.env.LOG_LEVEL?.toLowerCase() ?? 'none');
-    const _prefix = `\x1b[35m[${prefix}]\x1b[39m:`;
+    const _prefix = process.stdout.isTTY ? `\x1b[35m[${prefix}]\x1b[39m:` : `[${prefix}]:`;
 
     return {
         debug(...params: unknown[]): void {
@@ -18,12 +18,20 @@ export const createLogger = (
         },
         warn(...params: unknown[]): void {
             if (['debug', 'info', 'warn'].includes(_level)) {
-                console.error(`${_prefix}\x1b[33m`, ...params, '\x1b[39m');
+                if (process.stdout.isTTY) {
+                    console.error(`${_prefix}\x1b[33m`, ...params, '\x1b[39m');
+                } else {
+                    console.error(_prefix, ...params);
+                }
             }
         },
         error(...params: unknown[]): void {
             if (['debug', 'info', 'warn', 'error'].includes(_level)) {
-                console.error(`${_prefix}\x1b[31m`, ...params, '\x1b[39m');
+                if (process.stdout.isTTY) {
+                    console.error(`${_prefix}\x1b[31m`, ...params, '\x1b[39m');
+                } else {
+                    console.error(_prefix, ...params);
+                }
             }
         }
     };

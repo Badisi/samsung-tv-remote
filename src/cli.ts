@@ -38,10 +38,10 @@ const KEYS_MAP: Record<string, keyof typeof Keys> = {
     '\u001b': Keys.KEY_HOME // Escape
 };
 
-const cyan = (message: string): string => `\x1b[36m${message}\x1b[0m`;
-const gray = (message: string): string => `\x1b[90m${message}\x1b[0m`;
-const magenta = (message: string): string => `\x1b[35m${message}\x1b[0m`;
-const yellow = (message: string): string => `\x1b[33m${message}\x1b[0m`;
+const cyan = (message: string): string => process.stdout.isTTY ? `\x1b[36m${message}\x1b[0m` : message;
+const gray = (message: string): string => process.stdout.isTTY ? `\x1b[90m${message}\x1b[0m` : message;
+const magenta = (message: string): string => process.stdout.isTTY ? `\x1b[35m${message}\x1b[0m` : message;
+const yellow = (message: string): string => process.stdout.isTTY ? `\x1b[33m${message}\x1b[0m` : message;
 
 const deviceLabel = (device: SamsungDevice): string =>
     `${device.friendlyName ?? 'Unknown'} ${gray(`(ip: ${device.ip}, mac: ${device.mac})`)}`;
