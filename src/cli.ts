@@ -217,19 +217,18 @@ const withCookedMode = async (fn: () => Promise<void>): Promise<void> => {
             if (key.name === 't' && key.shift && adbAvailable) {
                 busy = true;
                 console.log(cyan('> Launching ADB shell — type "exit" or press Ctrl+D to return\n'));
-                if (process.stdin.isTTY) {
-                    process.stdin.setRawMode(false);
-                }
                 try {
-                    await launchAdbShell(selectedDevice!.ip);
-                } catch (err: unknown) {
-                    console.log(red(`> ADB shell failed: ${(err as Error).message}`));
+                    await withCookedMode(async () => {
+                        try {
+                            await launchAdbShell(selectedDevice!.ip);
+                        } catch (err: unknown) {
+                            console.log(red(`> ADB shell failed: ${(err as Error).message}`));
+                        }
+                    });
+                } finally {
+                    console.log(cyan('\n> Back in remote control mode'));
+                    busy = false;
                 }
-                console.log(cyan('\n> Back in remote control mode'));
-                if (process.stdin.isTTY) {
-                    process.stdin.setRawMode(true);
-                }
-                busy = false;
                 return;
             }
 
