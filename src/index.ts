@@ -8,6 +8,7 @@
  *  https://github.com/Badisi/samsung-tv-remote
  */
 
+export { installApk, isAdbAvailable, launchAdbShell } from './adb';
 export { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery';
 export { Keys } from './keys';
 export type { SamsungDevice, SamsungTvRemoteOptions } from './models';

@@ -98,6 +98,36 @@ export class SamsungTvRemote {
     }
 
     /**
+     * Sends a text string to the TV (e.g. to fill a search box).
+     *
+     * The TV must have a text input field focused for this to take effect.
+     *
+     * @async
+     * @param {string} text The text to send
+     * @returns {Promise<void>} A void promise
+     */
+    public async sendText(text: string): Promise<void> {
+        if (text) {
+            await this.#connectToTV();
+
+            logger.info('⌨️ Sending text...', text);
+            this.#webSocket?.send(
+                JSON.stringify({
+                    method: 'ms.remote.control',
+                    params: {
+                        Cmd: 'Click',
+                        DataOfCmd: Buffer.from(text).toString('base64'),
+                        Option: false,
+                        TypeOfRemote: 'SendInputString'
+                    }
+                })
+            );
+
+            await this.#delay(this.#options.keysDelay);
+        }
+    }
+
+    /**
      * Turns the TV on or awaken it from sleep mode (also called WoL - Wake-on-LAN).
      *
      * The mac address option is required in this case.

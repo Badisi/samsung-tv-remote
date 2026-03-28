@@ -1,4 +1,5 @@
 import { clearScreenDown, createInterface, emitKeypressEvents, moveCursor } from 'node:readline';
+import { installApk, isAdbAvailable, launchAdbShell } from './adb';
 import { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery';
 import { Keys } from './keys';
 import type { SamsungDevice } from './models';
@@ -40,13 +41,15 @@ const KEYS_MAP: Record<string, keyof typeof Keys> = {
 
 const cyan = (message: string): string => process.stdout.isTTY ? `\x1b[36m${message}\x1b[0m` : message;
 const gray = (message: string): string => process.stdout.isTTY ? `\x1b[90m${message}\x1b[0m` : message;
+const green = (message: string): string => process.stdout.isTTY ? `\x1b[32m${message}\x1b[0m` : message;
 const magenta = (message: string): string => process.stdout.isTTY ? `\x1b[35m${message}\x1b[0m` : message;
+const red = (message: string): string => process.stdout.isTTY ? `\x1b[31m${message}\x1b[0m` : message;
 const yellow = (message: string): string => process.stdout.isTTY ? `\x1b[33m${message}\x1b[0m` : message;
 
 const deviceLabel = (device: SamsungDevice): string =>
     `${device.friendlyName ?? 'Unknown'} ${gray(`(ip: ${device.ip}, mac: ${device.mac})`)}`;
 
-const displayHelp = () => {
+const displayHelp = (adbAvailable: boolean) => {
     console.log(cyan('Usage'));
     console.log(`  Arrows (${yellow('←/↑/↓/→')})`);
     console.log(`  Channel (${yellow('w/s')})`);
@@ -56,7 +59,15 @@ const displayHelp = () => {
     console.log(`  Play (${yellow('p')})`);
     console.log(`  Power (${yellow('q')})`);
     console.log(`  Return (${yellow('Backspace')})`);
-    console.log(`  Volume (${yellow('+/-')})\n`);
+    console.log(`  Send text (${yellow('t')})`);
+    console.log(`  Volume (${yellow('+/-')})`);
+    if (adbAvailable) {
+        console.log(`  Install APK (${yellow('i')})`);
+        console.log(`  Terminal session (${yellow('T')})`);
+    } else {
+        console.log(yellow('  [ADB not found — install/terminal features disabled]'));
+    }
+    console.log('');
 };
 
 const askQuestion = (question: string): Promise<string> =>
@@ -83,6 +94,20 @@ const chooseDevice = async (devices: SamsungDevice[]): Promise<number> => {
     return Number(await askQuestion(question));
 };
 
+/** Suspend raw mode, run an async operation, then restore raw mode. */
+const withCookedMode = async (fn: () => Promise<void>): Promise<void> => {
+    if (process.stdin.isTTY) {
+        process.stdin.setRawMode(false);
+    }
+    try {
+        await fn();
+    } finally {
+        if (process.stdin.isTTY) {
+            process.stdin.setRawMode(true);
+        }
+    }
+};
+
 (async () => {
     if (process.argv.includes('--version') || process.argv.includes('-v')) {
         console.log(process.env.npm_package_version);
@@ -90,7 +115,9 @@ const chooseDevice = async (devices: SamsungDevice[]): Promise<number> => {
     }
 
     console.log(magenta('[SamsungTvRemote]\n'));
-    displayHelp();
+
+    const adbAvailable = await isAdbAvailable();
+    displayHelp(adbAvailable);
 
     try {
         let selectedDevice: SamsungDevice | undefined;
@@ -137,7 +164,76 @@ const chooseDevice = async (devices: SamsungDevice[]): Promise<number> => {
         if (process.stdin.isTTY) {
             process.stdin.setRawMode(true); // allow raw-mode to catch character by character
         }
+
+        // Track whether we are already handling a modal prompt so we don't
+        // stack multiple overlapping interactions.
+        let busy = false;
+
         process.stdin.on('keypress', async (_str: string, key: KeyPressed) => {
+            if (busy) return;
+
+            // --- Send text to TV ---
+            if (key.name === 't' && !key.ctrl && !key.meta && !key.shift) {
+                busy = true;
+                await withCookedMode(async () => {
+                    const text = await askQuestion(cyan('> Enter text to send: '));
+                    if (text) {
+                        console.log(`${cyan('>')} sending text...`, gray(JSON.stringify(text)));
+                        await remote.sendText(text);
+                        setTimeout(() => {
+                            moveCursor(process.stdout, 0, -1);
+                            clearScreenDown(process.stdout);
+                        }, 250);
+                    }
+                });
+                busy = false;
+                return;
+            }
+
+            // --- Install APK via ADB ---
+            if (key.name === 'i' && !key.ctrl && !key.meta && !key.shift && adbAvailable) {
+                busy = true;
+                await withCookedMode(async () => {
+                    const apkPath = await askQuestion(cyan('> Path to APK file: '));
+                    if (apkPath) {
+                        console.log(`${cyan('>')} installing APK...`, gray(apkPath));
+                        try {
+                            await installApk(selectedDevice!.ip, apkPath);
+                            console.log(green('> APK installed successfully'));
+                        } catch (err: unknown) {
+                            console.log(red(`> APK install failed: ${(err as Error).message}`));
+                        }
+                        setTimeout(() => {
+                            moveCursor(process.stdout, 0, -1);
+                            clearScreenDown(process.stdout);
+                        }, 1500);
+                    }
+                });
+                busy = false;
+                return;
+            }
+
+            // --- ADB terminal session (Shift+T) ---
+            if (key.name === 't' && key.shift && adbAvailable) {
+                busy = true;
+                console.log(cyan('> Launching ADB shell — type "exit" or press Ctrl+D to return\n'));
+                if (process.stdin.isTTY) {
+                    process.stdin.setRawMode(false);
+                }
+                try {
+                    await launchAdbShell(selectedDevice!.ip);
+                } catch (err: unknown) {
+                    console.log(red(`> ADB shell failed: ${(err as Error).message}`));
+                }
+                console.log(cyan('\n> Back in remote control mode'));
+                if (process.stdin.isTTY) {
+                    process.stdin.setRawMode(true);
+                }
+                busy = false;
+                return;
+            }
+
+            // --- Standard remote-control keys ---
             if (key.sequence in KEYS_MAP) {
                 console.log(`${cyan('>')} sending...`, gray(KEYS_MAP[key.sequence]));
                 await remote.sendKey(KEYS_MAP[key.sequence]);
