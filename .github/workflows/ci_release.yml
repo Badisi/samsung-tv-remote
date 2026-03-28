@@ -6,7 +6,7 @@ on:
 
 jobs:
   ci_release:
-    uses: badisi/actions/.github/workflows/action.yml@v4
+    uses: badisi/actions/.github/workflows/action.yml@v5
     with:
       build: true
       release: true
