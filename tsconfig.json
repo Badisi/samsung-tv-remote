@@ -3,10 +3,14 @@
         "rootDir": "src",
         "outDir": "dist",
         "target": "es2015",
-        "lib": ["es2022"],
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "types": ["node"],
+        "lib": [
+            "es2022"
+        ],
+        "moduleResolution": "nodenext",
+        "module": "NodeNext",
+        "types": [
+            "node"
+        ],
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
@@ -23,6 +27,10 @@
         "strictPropertyInitialization": true,
         "noUnusedLocals": true
     },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"]
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }
