@@ -1,6 +1,6 @@
 {
     "name": "samsung-tv-remote",
-    "version": "3.0.4",
+    "version": "3.0.5",
     "description": "Remote client for Samsung SmartTV starting from 2016",
     "homepage": "https://github.com/Badisi/samsung-tv-remote",
     "license": "MIT",
