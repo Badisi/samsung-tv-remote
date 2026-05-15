@@ -40,13 +40,13 @@
     },
     "dependencies": {
         "wake_on_lan": "^1.0.0",
-        "ws": "^8.20.0"
+        "ws": "^8.20.1"
     },
     "devDependencies": {
-        "@types/node": "^25.6.0",
+        "@types/node": "^25.8.0",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.18.1",
-        "typescript": "^6.0.2"
+        "typescript": "^6.0.3"
     },
     "optionalDependencies": {
         "bufferutil": "^4.1.0"
