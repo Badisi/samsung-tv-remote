@@ -114,7 +114,7 @@ const chooseDevice = async (devices: SamsungDevice[]): Promise<number> => {
         } else {
             console.log(yellow("> Couldn't find any awake Samsung devices"));
 
-            selectedDevice = getLastConnectedDevice();
+            selectedDevice = await getLastConnectedDevice();
             if (selectedDevice) {
                 console.log(`${cyan('> Last connected device found:')} ${deviceLabel(selectedDevice)}`);
             } else {

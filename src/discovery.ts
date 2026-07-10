@@ -20,9 +20,9 @@ const SSDP_MSEARCH = [
  *
  * @returns {SamsungDevice | undefined} The device if found, or undefined otherwise
  */
-export const getLastConnectedDevice = (): SamsungDevice | undefined => {
+export const getLastConnectedDevice = async (): Promise<SamsungDevice | undefined> => {
     logger.info('🔍 Searching for a last connected device...');
-    const device = getDeviceFromCache();
+    const device = await getDeviceFromCache();
     if (!device) {
         logger.warn('No last connected device found');
     } else {

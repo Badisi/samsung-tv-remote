@@ -46,11 +46,14 @@ export class SamsungTvRemote {
         logger.info('Remote starting...');
         logger.debug(this.#options);
 
-        // Retrieve app token (if previously registered)
-        this.#appToken = this.#getAppToken(this.#options.ip, this.#options.port, this.#options.name);
+        this.#getAppToken(this.#options.ip, this.#options.port, this.#options.name)
+            .then(value => {
+                // Retrieve app token (if previously registered)
+                this.#appToken = value
 
-        // Initialize web socket url
-        this.#refreshWebSocketURL();
+                // Initialize web socket url
+                this.#refreshWebSocketURL();
+            });
     }
 
     // --- PUBLIC API(s) ---
@@ -150,10 +153,10 @@ export class SamsungTvRemote {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    #getAppToken(ip: string, port: number, appName: string): string | undefined {
+    async #getAppToken(ip: string, port: number, appName: string): Promise<string | undefined> {
         let value: string | undefined;
 
-        const app = getAppFromCache(appName);
+        const app = await getAppFromCache(appName);
         if (app && typeof app === 'object' && Object.hasOwn(app, `${ip}:${String(port)}`)) {
             value = app[`${ip}:${String(port)}`];
         }

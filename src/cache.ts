@@ -1,28 +1,28 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { Cache, SamsungApp, SamsungDevice } from './models';
 
-export const getDeviceFromCache = (): SamsungDevice | undefined => {
-    return getCache().lastConnectedDevice;
+export const getDeviceFromCache = async (): Promise<SamsungDevice | undefined> => {
+    return (await getCache()).lastConnectedDevice;
 };
 
-export const saveDeviceToCache = (ip: string, mac: string, friendlyName: string): void => {
-    const cache = getCache();
+export const saveDeviceToCache = async (ip: string, mac: string, friendlyName: string): Promise<void> => {
+    const cache = await getCache();
     cache.lastConnectedDevice = { ip, mac, friendlyName };
-    writeFileSync(getCacheFilePath(), JSON.stringify(cache));
+    await writeFile(getCacheFilePath(), JSON.stringify(cache));
 };
 
-export const getAppFromCache = (appName: string): SamsungApp | undefined => {
-    return getCache().appTokens?.[appName];
+export const getAppFromCache = async (appName: string): Promise<SamsungApp | undefined> => {
+    return (await getCache()).appTokens?.[appName];
 };
 
-export const saveAppToCache = (ip: string, port: number, appName: string, appToken: string): void => {
-    const cache = getCache();
+export const saveAppToCache = async (ip: string, port: number, appName: string, appToken: string): Promise<void> => {
+    const cache = await getCache();
     cache.appTokens ??= {};
     cache.appTokens[appName] ??= {};
     cache.appTokens[appName][`${ip}:${String(port)}`] = appToken;
-    writeFileSync(getCacheFilePath(), JSON.stringify(cache));
+    await writeFile(getCacheFilePath(), JSON.stringify(cache));
 };
 
 // --- HELPER(s) ---
@@ -39,13 +39,9 @@ const getCacheFilePath = (name = 'badisi-samsung-tv-remote.json'): string => {
     }
 };
 
-const getCache = (): Cache => {
+const getCache = async (): Promise<Cache> => {
     try {
-        const filePath = getCacheFilePath();
-        if (existsSync(filePath)) {
-            return JSON.parse(readFileSync(filePath).toString());
-        }
-        return {} as Cache;
+        return JSON.parse(await readFile(getCacheFilePath(), 'utf8'));
     } catch {
         return {} as Cache;
     }
