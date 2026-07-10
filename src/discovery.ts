@@ -75,16 +75,16 @@ export const getAwakeSamsungDevices = async (timeout: number = 500): Promise<Sam
 
             logger.debug(`Received message from '${remoteInfo.address}:${remoteInfo.port}':\n`, response);
 
-            if (response.SERVER?.includes('Samsung')) {
+            if (response['SERVER']?.includes('Samsung')) {
                 const device = {
                     friendlyName: 'Unknown',
                     ip: remoteInfo.address,
                     mac: '00:00:00:00:00:00'
                 };
 
-                if (response.LOCATION) {
+                if (response['LOCATION']) {
                     try {
-                        const result = await (await fetch(response.LOCATION)).text();
+                        const result = await (await fetch(response['LOCATION'])).text();
                         const regexp = /<friendlyName>(.*?)<\/friendlyName>/gi;
                         device.friendlyName = [...result.matchAll(regexp)]?.[0]?.[1];
                     } catch {
@@ -92,8 +92,8 @@ export const getAwakeSamsungDevices = async (timeout: number = 500): Promise<Sam
                     }
                 }
 
-                if (response.WAKEUP) {
-                    const result = response.WAKEUP.match(/\s*MAC=([0-9a-fA-F:]+)/);
+                if (response['WAKEUP']) {
+                    const result = response['WAKEUP'].match(/\s*MAC=([0-9a-fA-F:]+)/);
                     if (result) {
                         device.mac = result[1];
                     }

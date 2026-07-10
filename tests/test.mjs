@@ -1,6 +1,4 @@
-// @ts-check
-
-import { getAwakeSamsungDevices, getLastConnectedDevice, Keys, SamsungTvRemote } from '../dist/index.js';
+import { getAwakeSamsungDevices, getLastConnectedDevice, Keys, SamsungTvRemote } from '../src';
 
 (async () => {
     let device = getLastConnectedDevice();

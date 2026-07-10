@@ -1,6 +1,4 @@
-// @ts-check
-
-const { getAwakeSamsungDevices, Keys, SamsungTvRemote, getLastConnectedDevice } = require('../dist');
+const { getAwakeSamsungDevices, Keys, SamsungTvRemote, getLastConnectedDevice } = require('../src');
 
 (async () => {
     let device = getLastConnectedDevice();

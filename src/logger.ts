@@ -2,7 +2,7 @@ export const createLogger = (
     prefix = 'SamsungTvRemote',
     level: 'none' | 'debug' | 'info' | 'warn' | 'error' = 'none'
 ) => {
-    const _level = level !== 'none' ? level : (process.env.LOG_LEVEL?.toLowerCase() ?? 'none');
+    const _level = level !== 'none' ? level : (process.env['LOG_LEVEL']?.toLowerCase() ?? 'none');
     const _prefix = process.stdout.isTTY ? `\x1b[35m[${prefix}]\x1b[39m:` : `[${prefix}]:`;
 
     return {

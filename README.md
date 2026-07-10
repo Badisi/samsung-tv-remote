@@ -30,6 +30,7 @@
 ✅ Send `one` or `multiple` keys at once to a TV<br/>
 ✅ [`241`][keys] known keys already predefined<br/>
 ✅ Works as a `library` and as a `CLI` tool<br/>
+✅ Dual build support (CJS/ESM)<br/>
 
 
 ## Command line tool

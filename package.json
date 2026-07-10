@@ -7,14 +7,20 @@
     "author": {
         "name": "Badisi"
     },
-    "type": "commonjs",
-    "main": "index.js",
-    "typings": "index.d.ts",
+    "type": "module",
+    "main": "./index.cjs",
+    "module": "./index.mjs",
+    "types": "./index.d.mts",
     "exports": {
         ".": {
-            "require": "./index.js",
-            "types": "./index.d.ts",
-            "default": "./index.js"
+            "import": {
+                "types": "./index.d.mts",
+                "default": "./index.mjs"
+            },
+            "require": {
+                "types": "./index.d.cts",
+                "default": "./index.cjs"
+            }
         },
         "./package.json": "./package.json"
     },
@@ -32,10 +38,11 @@
     ],
     "scripts": {
         "check-updates": "npx @badisi/check-updates -i",
-        "build": "node ./build.mjs",
-        "test:cli": "npm run build && ./dist/bin/samsung-tv-remote --verbose",
-        "test:cjs": "npm run build && LOG_LEVEL=debug node ./tests/test.cjs",
-        "test:mjs": "npm run build && LOG_LEVEL=info node ./tests/test.mjs",
+        "start": "tsx ./src/cli.ts --verbose",
+        "test:cjs": "LOG_LEVEL=debug tsx ./tests/test.cjs",
+        "test:mjs": "LOG_LEVEL=info tsx ./tests/test.mjs",
+        "typecheck": "tsc --noEmit",
+        "build": "tsc && tsdown",
         "release": "npm publish ./dist --access public"
     },
     "dependencies": {
@@ -46,7 +53,9 @@
         "@types/node": "^26.1.1",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.18.1",
-        "typescript": "^7.0.2"
+        "tsdown": "^0.22.4",
+        "tsx": "^4.23.0",
+        "typescript": "^6.0.3"
     },
     "optionalDependencies": {
         "bufferutil": "^4.1.0"

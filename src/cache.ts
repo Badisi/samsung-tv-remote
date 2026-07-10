@@ -33,9 +33,9 @@ const getCacheFilePath = (name = 'badisi-samsung-tv-remote.json'): string => {
         case 'darwin':
             return join(homeDir, 'Library', 'Caches', name);
         case 'win32':
-            return join(process.env.LOCALAPPDATA ?? join(homeDir, 'AppData', 'Local'), name);
+            return join(process.env['LOCALAPPDATA'] ?? join(homeDir, 'AppData', 'Local'), name);
         default:
-            return join(process.env.XDG_CACHE_HOME ?? join(homeDir, '.cache'), name);
+            return join(process.env['XDG_CACHE_HOME'] ?? join(homeDir, '.cache'), name);
     }
 };
 
