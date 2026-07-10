@@ -23,7 +23,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Badisi/samsung-tv-remote"
+        "url": "git+https://github.com/Badisi/samsung-tv-remote.git"
     },
     "keywords": [
         "samsung",
