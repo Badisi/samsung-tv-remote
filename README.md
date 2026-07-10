@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-    <i>📺 NodeJS module to remotely control Samsung SmartTV starting from 2016.</i><br/>
+    📺 <i>NodeJS module to remotely control Samsung SmartTV starting from 2016.</i><br/>
 </p>
 
 <p align="center">
