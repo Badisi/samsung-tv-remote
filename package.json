@@ -42,7 +42,7 @@
         "test:cjs": "LOG_LEVEL=debug tsx ./tests/test.cjs",
         "test:mjs": "LOG_LEVEL=info tsx ./tests/test.mjs",
         "typecheck": "tsc --noEmit",
-        "build": "tsc && tsdown",
+        "build": "tsc --noEmit && tsdown",
         "release": "npm publish ./dist --access public"
     },
     "dependencies": {
