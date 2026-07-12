@@ -13,7 +13,7 @@ const config: UserConfig[] = defineConfig([{
     },
     onSuccess: (): void => {
         const pkgJson = JSON.parse(readFileSync('package.json', 'utf8')) as Record<string, unknown>;
-        const postinstall = (pkgJson['scripts'] as Record<string, string>)?.['postinstall'];
+        const postinstall = (pkgJson['scripts'] as Record<string, string> | undefined)?.['postinstall'];
         if (postinstall) {
             pkgJson['scripts'] = { postinstall };
         } else {
