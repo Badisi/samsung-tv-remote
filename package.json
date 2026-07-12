@@ -7,7 +7,6 @@
     "author": {
         "name": "Badisi"
     },
-    "type": "module",
     "main": "./index.cjs",
     "module": "./index.mjs",
     "types": "./index.d.mts",

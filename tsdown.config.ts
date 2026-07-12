@@ -13,7 +13,12 @@ const config: UserConfig[] = defineConfig([{
     },
     onSuccess: (): void => {
         const pkgJson = JSON.parse(readFileSync('package.json', 'utf8')) as Record<string, unknown>;
-        delete pkgJson['scripts'];
+        const postinstall = (pkgJson['scripts'] as Record<string, string>)?.['postinstall'];
+        if (postinstall) {
+            pkgJson['scripts'] = { postinstall };
+        } else {
+            delete pkgJson['scripts'];
+        }
         delete pkgJson['publishConfig'];
         delete pkgJson['devDependencies'];
         writeFileSync('dist/package.json', JSON.stringify(pkgJson, null, 4));
