@@ -16,7 +16,12 @@
         "resolveJsonModule": true,
         "declaration": true,
         "isolatedModules": true,
-        "isolatedDeclarations": true
+        "isolatedDeclarations": true,
+        "paths": {
+            "samsung-tv-remote": [
+                "./src/index.ts"
+            ]
+        }
     },
     "include": [
         "tsdown.config.mts",

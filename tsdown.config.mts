@@ -7,6 +7,9 @@ const config: UserConfig[] = defineConfig([{
     clean: true,
     dts: false,
     sourcemap: false,
+    deps: {
+        neverBundle: ['samsung-tv-remote']
+    },
     onSuccess: (): void => {
         cpSync('bin', 'dist/bin', { recursive: true });
     }

@@ -1,8 +1,5 @@
 import { clearScreenDown, createInterface, emitKeypressEvents, moveCursor } from 'node:readline';
-import { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery';
-import { Keys } from './keys';
-import type { SamsungDevice } from './models';
-import { SamsungTvRemote } from './remote';
+import { Keys, type SamsungDevice, SamsungTvRemote, getAwakeSamsungDevices, getLastConnectedDevice } from 'samsung-tv-remote';
 
 interface KeyPressed {
     sequence: string;
