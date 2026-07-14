@@ -46,20 +46,22 @@
     },
     "dependencies": {
         "wake_on_lan": "^1.0.0",
-        "ws": "^8.21.0"
+        "ws": "^8.21.1"
     },
     "devDependencies": {
         "@types/node": "^26.1.1",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.18.1",
-        "tsdown": "^0.22.4",
-        "tsx": "^4.23.0",
+        "tsdown": "^0.22.7",
+        "tsx": "^4.23.1",
         "typescript": "^6.0.3"
     },
     "optionalDependencies": {
         "bufferutil": "^4.1.0"
     },
     "allowScripts": {
-        "bufferutil@4.1.0": true
+        "esbuild": true,
+        "fsevents": true,
+        "bufferutil": true
     }
 }
