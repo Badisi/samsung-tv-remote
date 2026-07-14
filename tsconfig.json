@@ -19,7 +19,7 @@
         "isolatedDeclarations": true
     },
     "include": [
-        "tsdown.config.ts",
+        "tsdown.config.mts",
         "src/**/*.ts"
     ],
     "exclude": [

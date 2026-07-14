@@ -2,7 +2,16 @@ import { copyFileSync, cpSync, readFileSync, writeFileSync } from 'node:fs';
 import { defineConfig, type UserConfig } from 'tsdown';
 
 const config: UserConfig[] = defineConfig([{
-    entry: ['src/index.ts', 'src/cli.ts'],
+    entry: ['src/cli.ts'],
+    format: ['esm'],
+    clean: true,
+    dts: false,
+    sourcemap: false,
+    onSuccess: (): void => {
+        cpSync('bin', 'dist/bin', { recursive: true });
+    }
+}, {
+    entry: ['src/index.ts'],
     format: ['esm', 'cjs'],
     clean: true,
     sourcemap: false,
@@ -23,7 +32,6 @@ const config: UserConfig[] = defineConfig([{
         delete pkgJson['devDependencies'];
         writeFileSync('dist/package.json', JSON.stringify(pkgJson, null, 4));
 
-        cpSync('bin', 'dist/bin', { recursive: true });
         copyFileSync('README.md', 'dist/README.md');
         copyFileSync('LICENSE', 'dist/LICENSE');
     },
