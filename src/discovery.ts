@@ -3,7 +3,8 @@ import { getDeviceFromCache } from './cache';
 import { createLogger } from './logger';
 import type { SamsungDevice } from './models';
 
-const logger = createLogger('SamsungTvDiscovery');
+let _logger: ReturnType<typeof createLogger>;
+const getLogger = () => _logger ??= createLogger('SamsungTvDiscovery');
 
 const SSDP_MSEARCH = [
     'M-SEARCH * HTTP/1.1',
@@ -21,12 +22,12 @@ const SSDP_MSEARCH = [
  * @returns {SamsungDevice | undefined} The device if found, or undefined otherwise
  */
 export const getLastConnectedDevice = async (): Promise<SamsungDevice | undefined> => {
-    logger.info('🔍 Searching for a last connected device...');
+    getLogger().info('🔍 Searching for a last connected device...');
     const device = await getDeviceFromCache();
     if (!device) {
-        logger.warn('No last connected device found');
+        getLogger().warn('No last connected device found');
     } else {
-        logger.info('✅ Found last connected device:', device);
+        getLogger().info('✅ Found last connected device:', device);
     }
     return device;
 };
@@ -39,7 +40,7 @@ export const getLastConnectedDevice = async (): Promise<SamsungDevice | undefine
  * @returns {Promise<SamsungDevice[]>} A promise that resolves with an array of awake Samsung devices
  */
 export const getAwakeSamsungDevices = async (timeout: number = 500): Promise<SamsungDevice[]> => {
-    logger.info('🔍 Searching for awake Samsung devices...');
+    getLogger().info('🔍 Searching for awake Samsung devices...');
 
     return new Promise(resolve => {
         const devices: SamsungDevice[] = [];
@@ -47,23 +48,23 @@ export const getAwakeSamsungDevices = async (timeout: number = 500): Promise<Sam
 
         const resolveWithDevices = () => {
             if (!devices.length) {
-                logger.warn('No Samsung devices found');
+                getLogger().warn('No Samsung devices found');
             }
             resolve(devices);
         };
 
         socket.on('listening', () => {
             const address = socket.address();
-            logger.debug(`Listening on '${address.address}:${address.port}'...`);
+            getLogger().debug(`Listening on '${address.address}:${address.port}'...`);
 
             // Send M-SEARCH message
             const message = Buffer.from(SSDP_MSEARCH);
             socket.setBroadcast(true);
             socket.setMulticastTTL(2); // 2, to limit to local network
-            logger.debug('Sending M-SEARCH message...');
+            getLogger().debug('Sending M-SEARCH message...');
             socket.send(message, 0, message.length, 1900, '239.255.255.250', error => {
                 if (error) {
-                    logger.error('Failed:', error);
+                    getLogger().error('Failed:', error);
                     socket.close();
                     resolveWithDevices();
                 }
@@ -73,7 +74,7 @@ export const getAwakeSamsungDevices = async (timeout: number = 500): Promise<Sam
         socket.on('message', async (message: Buffer<ArrayBuffer>, remoteInfo: RemoteInfo): Promise<void> => {
             const response = messageToJson(message);
 
-            logger.debug(`Received message from '${remoteInfo.address}:${remoteInfo.port}':\n`, response);
+            getLogger().debug(`Received message from '${remoteInfo.address}:${remoteInfo.port}':\n`, response);
 
             if (response['SERVER']?.includes('Samsung')) {
                 const device = {
@@ -99,13 +100,13 @@ export const getAwakeSamsungDevices = async (timeout: number = 500): Promise<Sam
                     }
                 }
 
-                logger.info('✅ Found Samsung device:', device);
+                getLogger().info('✅ Found Samsung device:', device);
                 devices.push(device);
             }
         });
 
         socket.on('error', error => {
-            logger.error('Socket error:', error);
+            getLogger().error('Socket error:', error);
             socket.close();
             resolveWithDevices();
         });

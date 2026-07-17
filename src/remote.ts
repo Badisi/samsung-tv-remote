@@ -6,7 +6,8 @@ import type { Keys } from './keys';
 import { createLogger } from './logger';
 import type { SamsungTvRemoteOptions } from './models';
 
-const logger = createLogger();
+let _logger: ReturnType<typeof createLogger>;
+const getLogger = () => _logger ??= createLogger();
 
 const DEFAULT_OPTIONS: Required<Omit<SamsungTvRemoteOptions, 'ip' | 'device'>> = {
     name: 'SamsungTvRemote',
@@ -43,8 +44,8 @@ export class SamsungTvRemote {
             throw new Error('TV IP address is required');
         }
 
-        logger.info('Remote starting...');
-        logger.debug(this.#options);
+        getLogger().info('Remote starting...');
+        getLogger().debug(this.#options);
 
         this.#getAppToken(this.#options.ip, this.#options.port, this.#options.name)
             .then(value => {
@@ -69,7 +70,7 @@ export class SamsungTvRemote {
         if (key) {
             await this.#connectToTV();
 
-            logger.info('📡 Sending key...', key);
+            getLogger().info('📡 Sending key...', key);
             this.#webSocket?.send(
                 JSON.stringify({
                     method: 'ms.remote.control',
@@ -110,11 +111,11 @@ export class SamsungTvRemote {
      */
     public async wakeTV(): Promise<void> {
         if (await this.#isTvAlive()) {
-            logger.info('💤 Waking TV... already up');
+            getLogger().info('💤 Waking TV... already up');
             return;
         }
 
-        logger.info('💤 Waking TV...');
+        getLogger().info('💤 Waking TV...');
 
         if (!this.#options.mac) {
             throw new Error('TV mac address is required');
@@ -143,7 +144,7 @@ export class SamsungTvRemote {
      * It doesn't shut down the TV - it only closes the connection to it.
      */
     public disconnect(): void {
-        logger.info('📺 Disconnecting from TV...');
+        getLogger().info('📺 Disconnecting from TV...');
         this.#disconnectFromTV();
     }
 
@@ -162,9 +163,9 @@ export class SamsungTvRemote {
         }
 
         if (value) {
-            logger.info('✅ App token found:', value);
+            getLogger().info('✅ App token found:', value);
         } else {
-            logger.warn('No token found: app is not registered yet and will need to be authorized on TV');
+            getLogger().warn('No token found: app is not registered yet and will need to be authorized on TV');
         }
 
         return value;
@@ -206,8 +207,8 @@ export class SamsungTvRemote {
 
         // Otherwise -> starts new connection
         this.#connectingPromise = new Promise((resolve, reject) => {
-            logger.info('📺 Connecting to TV...');
-            logger.debug('Using websocket:', this.#webSocketURL);
+            getLogger().info('📺 Connecting to TV...');
+            getLogger().debug('Using websocket:', this.#webSocketURL);
 
             const _webSocket = new WebSocket(this.#webSocketURL, {
                 timeout: this.#options.timeout,
@@ -242,7 +243,7 @@ export class SamsungTvRemote {
             _webSocket.once('message', data => {
                 const message = JSON.parse(data.toString());
                 if (message.event === 'ms.channel.connect') {
-                    logger.info('✅ Connected to TV');
+                    getLogger().info('✅ Connected to TV');
 
                     // Save token for next time (if not already in cache)
                     if (!this.#appToken && message.data?.token) {

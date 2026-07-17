@@ -7,9 +7,10 @@
     "author": {
         "name": "Badisi"
     },
+    "sideEffects": false,
     "main": "./index.cjs",
     "module": "./index.mjs",
-    "types": "./index.d.mts",
+    "types": "./index.d.cts",
     "exports": {
         ".": {
             "import": {
@@ -29,6 +30,9 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/Badisi/samsung-tv-remote.git"
+    },
+    "engines": {
+        "node": ">= 18"
     },
     "keywords": [
         "samsung",
