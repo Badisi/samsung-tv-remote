@@ -80,7 +80,7 @@ const chooseDevice = async (devices: SamsungDevice[]): Promise<number> => {
     return Number(await askQuestion(question));
 };
 
-(async () => {
+void (async () => {
     if (process.argv.includes('--version') || process.argv.includes('-v')) {
         console.log(process.env['npm_package_version']);
         process.exit();
