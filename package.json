@@ -50,15 +50,15 @@
     },
     "dependencies": {
         "wake_on_lan": "^1.0.0",
-        "ws": "^8.21.1"
+        "ws": "^8.21.2"
     },
     "devDependencies": {
-        "@types/node": "^26.1.1",
+        "@types/node": "^26.1.2",
         "@types/wake_on_lan": "^0.0.33",
         "@types/ws": "^8.18.1",
-        "tsdown": "^0.22.7",
-        "tsx": "^4.23.1",
-        "typescript": "^6.0.3"
+        "tsdown": "^0.22.14",
+        "tsx": "^4.23.8",
+        "typescript": "^7.0.2"
     },
     "optionalDependencies": {
         "bufferutil": "^4.1.0"
