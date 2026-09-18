@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { Cache, SamsungApp, SamsungDevice } from './models';
+import type { Cache, SamsungApp, SamsungDevice } from './models/index.js';
 
 export const getDeviceFromCache = async (): Promise<SamsungDevice | undefined> => {
     return (await getCache()).lastConnectedDevice;

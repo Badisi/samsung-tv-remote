@@ -1,7 +1,7 @@
 import { createSocket, type RemoteInfo } from 'node:dgram';
-import { getDeviceFromCache } from './cache';
-import { createLogger } from './logger';
-import type { SamsungDevice } from './models';
+import { getDeviceFromCache } from './cache.js';
+import { createLogger } from './logger.js';
+import type { SamsungDevice } from './models/index.js';
 
 let _logger: ReturnType<typeof createLogger>;
 const getLogger = () => _logger ??= createLogger('SamsungTvDiscovery');

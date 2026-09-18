@@ -1,10 +1,10 @@
 import { exec } from 'node:child_process';
 import { wake } from 'wake_on_lan';
 import WebSocket from 'ws';
-import { getAppFromCache, saveAppToCache, saveDeviceToCache } from './cache';
-import type { Keys } from './keys';
-import { createLogger } from './logger';
-import type { SamsungTvRemoteOptions } from './models';
+import { getAppFromCache, saveAppToCache, saveDeviceToCache } from './cache.js';
+import type { Keys } from './keys.js';
+import { createLogger } from './logger.js';
+import type { SamsungTvRemoteOptions } from './models/index.js';
 
 let _logger: ReturnType<typeof createLogger>;
 const getLogger = () => _logger ??= createLogger();

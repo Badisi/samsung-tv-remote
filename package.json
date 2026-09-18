@@ -8,6 +8,7 @@
         "name": "Badisi"
     },
     "sideEffects": false,
+    "type": "module",
     "main": "./index.cjs",
     "module": "./index.mjs",
     "types": "./index.d.cts",
@@ -42,9 +43,9 @@
     "scripts": {
         "check-updates": "npx @badisi/check-updates -i",
         "start": "tsx ./src/cli.ts --verbose",
+        "typecheck": "tsc --noEmit",
         "test:cjs": "LOG_LEVEL=debug tsx ./tests/test.cjs",
         "test:mjs": "LOG_LEVEL=info tsx ./tests/test.mjs",
-        "typecheck": "tsc --noEmit",
         "build": "tsc --noEmit && tsdown",
         "release": "npm publish ./dist --access public"
     },

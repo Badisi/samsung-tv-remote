@@ -5,8 +5,8 @@
         "lib": [
             "ESNext"
         ],
-        "module": "ESNext",
-        "moduleResolution": "bundler",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
         "types": [
             "node"
         ],

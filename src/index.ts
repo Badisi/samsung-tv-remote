@@ -8,7 +8,7 @@
  *  https://github.com/Badisi/samsung-tv-remote
  */
 
-export { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery';
-export { Keys } from './keys';
-export type { SamsungDevice, SamsungTvRemoteOptions } from './models';
-export { SamsungTvRemote } from './remote';
+export { getAwakeSamsungDevices, getLastConnectedDevice } from './discovery.js';
+export { Keys } from './keys.js';
+export type { SamsungDevice, SamsungTvRemoteOptions } from './models/index.js';
+export { SamsungTvRemote } from './remote.js';

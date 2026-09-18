@@ -1,4 +1,4 @@
-import type { SamsungDevice } from './samsung-device.model';
+import type { SamsungDevice } from './samsung-device.model.js';
 
 export interface SamsungTvRemoteOptions {
     /**
